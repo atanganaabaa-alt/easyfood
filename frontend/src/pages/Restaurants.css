@@ -1,0 +1,48 @@
+.ef-page { padding: 40px 20px 60px; }
+
+.ef-page-head { margin-bottom: 22px; }
+.ef-page-head h1 { font-size: 2rem; }
+
+.ef-search {
+  max-width: 480px;
+  margin-bottom: 30px;
+}
+
+.ef-resto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.ef-resto-card {
+  display: flex;
+  flex-direction: column;
+}
+.ef-resto-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(120, 70, 20, 0.18);
+}
+
+.ef-resto-img {
+  height: 160px;
+  background-size: cover;
+  background-position: center;
+}
+
+.ef-resto-body { padding: 18px 20px 22px; }
+.ef-resto-body h3 { font-size: 1.25rem; }
+
+.ef-resto-adresse {
+  color: var(--ef-orange-fonce);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 4px 0 10px;
+}
+.ef-resto-desc {
+  font-size: 0.92rem;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

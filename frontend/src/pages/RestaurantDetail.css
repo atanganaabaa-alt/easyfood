@@ -1,0 +1,67 @@
+.ef-detail-banner {
+  height: 280px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+}
+.ef-detail-banner-overlay {
+  width: 100%;
+  padding: 30px 0;
+  background: linear-gradient(transparent, rgba(43, 33, 24, 0.85));
+  color: #fff;
+}
+.ef-detail-banner-overlay h1 { font-size: 2.3rem; margin-bottom: 4px; }
+.ef-detail-banner-overlay p { font-weight: 600; margin: 4px 0 10px; }
+
+.ef-detail-retour {
+  display: inline-block;
+  margin-bottom: 14px;
+  font-weight: 600;
+  color: #fff;
+  opacity: 0.9;
+}
+.ef-detail-retour:hover { opacity: 1; }
+
+.ef-detail-desc {
+  font-size: 1.05rem;
+  color: var(--ef-gris);
+  max-width: 700px;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.ef-menu-title { font-size: 1.6rem; margin-bottom: 20px; }
+
+.ef-plat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 22px;
+}
+
+.ef-plat-card { display: flex; flex-direction: column; }
+.ef-plat-card.indispo { opacity: 0.65; }
+.ef-plat-card:hover { transform: translateY(-3px); }
+
+.ef-plat-img {
+  height: 150px;
+  background-size: cover;
+  background-position: center;
+}
+.ef-plat-body { padding: 16px 18px 20px; }
+.ef-plat-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.ef-plat-head h3 { font-size: 1.1rem; }
+.ef-plat-prix {
+  font-weight: 800;
+  color: var(--ef-orange-fonce);
+  white-space: nowrap;
+}
+.ef-plat-desc {
+  font-size: 0.9rem;
+  margin: 6px 0 12px;
+}

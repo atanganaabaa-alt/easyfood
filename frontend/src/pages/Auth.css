@@ -1,0 +1,73 @@
+/* Styles partagés par les pages Connexion et Inscription. */
+.ef-auth-wrap {
+  min-height: calc(100vh - 68px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(244, 179, 36, 0.15), transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(239, 108, 26, 0.15), transparent 40%);
+}
+
+.ef-auth-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 36px;
+}
+
+.ef-auth-title {
+  font-size: 1.7rem;
+  text-align: center;
+}
+.ef-auth-subtitle {
+  text-align: center;
+  color: var(--ef-gris);
+  margin-bottom: 28px;
+}
+
+.ef-auth-switch {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--ef-gris);
+}
+.ef-auth-switch a {
+  color: var(--ef-orange);
+  font-weight: 700;
+}
+
+/* Sélecteur de rôle sous forme de cartes cliquables. */
+.ef-role-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.ef-role-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 8px;
+  border: 2px solid var(--ef-bordure);
+  border-radius: 12px;
+  cursor: pointer;
+  background: #fffdfb;
+  transition: all 0.12s ease;
+  text-align: center;
+}
+.ef-role-option:hover { border-color: var(--ef-jaune); }
+.ef-role-option.active {
+  border-color: var(--ef-orange);
+  background: rgba(239, 108, 26, 0.08);
+}
+.ef-role-emoji { font-size: 1.5rem; }
+.ef-role-label { font-weight: 600; font-size: 0.9rem; }
+
+.ef-demo-hint {
+  margin-top: 18px;
+  padding: 12px 14px;
+  background: rgba(244, 179, 36, 0.12);
+  border-radius: 12px;
+  font-size: 0.85rem;
+  color: var(--ef-texte);
+}
