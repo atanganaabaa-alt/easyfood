@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
-import { formaterPrix } from '../utils/format';
+import { formaterPrix, formaterFrais, formaterDelai } from '../utils/format';
 import './RestaurantDetail.css';
 
 const PLAT_DEFAUT = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400';
@@ -58,6 +58,12 @@ function RestaurantDetail() {
             <Link to="/restaurants" className="ef-detail-retour">← Tous les restaurants</Link>
             <h1>{restaurant.nom}</h1>
             <p>📍 {restaurant.adresse}</p>
+            <div className="ef-detail-meta">
+              <span>⭐ {Number(restaurant.note).toFixed(1)}</span>
+              <span>⏱️ {formaterDelai(restaurant.delai_min, restaurant.delai_max)}</span>
+              <span>📍 {Number(restaurant.distance_km).toFixed(1)} km</span>
+              <span>🛵 {formaterFrais(restaurant.frais_livraison)}</span>
+            </div>
             {restaurant.horaires && <span className="ef-badge">🕒 {restaurant.horaires}</span>}
           </div>
         </div>

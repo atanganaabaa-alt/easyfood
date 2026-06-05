@@ -36,6 +36,12 @@ CREATE TABLE restaurants (
   description     TEXT,
   logo_url        VARCHAR(500),
   horaires        VARCHAR(255),                 -- ex: "Lun-Dim : 09h - 22h"
+  -- Champs utiles à la comparaison (trouver le meilleur restaurant) :
+  note            NUMERIC(2,1) NOT NULL DEFAULT 0,    -- note moyenne sur 5 (ex: 4.8)
+  delai_min       INTEGER NOT NULL DEFAULT 20,        -- délai de livraison minimum (minutes)
+  delai_max       INTEGER NOT NULL DEFAULT 40,        -- délai de livraison maximum (minutes)
+  frais_livraison INTEGER NOT NULL DEFAULT 0,         -- frais de livraison en XAF
+  distance_km     NUMERIC(4,1) NOT NULL DEFAULT 0,    -- distance approximative en km
   proprietaire_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   created_at      TIMESTAMP NOT NULL DEFAULT NOW()
 );

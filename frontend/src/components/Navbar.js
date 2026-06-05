@@ -1,4 +1,5 @@
 // Barre de navigation principale, présente sur toutes les pages.
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
@@ -6,11 +7,19 @@ import './Navbar.css';
 function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [recherche, setRecherche] = useState('');
 
   // Déconnecte l'utilisateur et le ramène à l'accueil.
   const seDeconnecter = () => {
     logout();
     navigate('/');
+  };
+
+  // Lance la recherche : redirige vers la liste des restaurants avec le terme saisi.
+  const lancerRecherche = (e) => {
+    e.preventDefault();
+    const terme = recherche.trim();
+    navigate(terme ? `/restaurants?q=${encodeURIComponent(terme)}` : '/restaurants');
   };
 
   return (
@@ -21,12 +30,22 @@ function Navbar() {
           <span>Easy<span className="ef-logo-accent">Food</span></span>
         </Link>
 
-        <nav className="ef-nav-links">
-          <Link to="/restaurants">Restaurants</Link>
+        {/* Barre de recherche centrale (style livraison). */}
+        <form className="ef-nav-search" onSubmit={lancerRecherche}>
+          <span className="ef-nav-search-icon" aria-hidden="true">🔎</span>
+          <input
+            type="search"
+            className="ef-nav-search-input"
+            placeholder="Rechercher un restaurant ou un plat"
+            value={recherche}
+            onChange={(e) => setRecherche(e.target.value)}
+          />
+        </form>
 
+        <nav className="ef-nav-links">
           {/* Lien vers le tableau de bord réservé aux restaurateurs. */}
           {user?.role === 'restaurateur' && (
-            <Link to="/restaurateur">Mon restaurant</Link>
+            <Link to="/restaurateur" className="ef-nav-link">Mon restaurant</Link>
           )}
 
           {user ? (

@@ -7,7 +7,10 @@ import { formaterPrix } from '../utils/format';
 import './TableauRestaurateur.css';
 
 // Champs vides pour le formulaire de profil du restaurant.
-const RESTO_VIDE = { nom: '', adresse: '', description: '', logo_url: '', horaires: '' };
+const RESTO_VIDE = {
+  nom: '', adresse: '', description: '', logo_url: '', horaires: '',
+  delai_min: 20, delai_max: 40, frais_livraison: 0, distance_km: 0,
+};
 // Champs vides pour le formulaire d'ajout de plat.
 const PLAT_VIDE = { nom: '', description: '', prix: '', photo_url: '' };
 
@@ -38,6 +41,10 @@ function TableauRestaurateur() {
           description: monResto.description || '',
           logo_url: monResto.logo_url || '',
           horaires: monResto.horaires || '',
+          delai_min: monResto.delai_min ?? 20,
+          delai_max: monResto.delai_max ?? 40,
+          frais_livraison: monResto.frais_livraison ?? 0,
+          distance_km: monResto.distance_km ?? 0,
         });
         const { data: sesPlats } = await api.get(`/plats/restaurant/${monResto.id}`);
         setPlats(sesPlats);
@@ -63,13 +70,21 @@ function TableauRestaurateur() {
     e.preventDefault();
     setErreur('');
     setSucces('');
+    // On convertit les champs numériques avant l'envoi.
+    const charge = {
+      ...formResto,
+      delai_min: Number(formResto.delai_min) || 0,
+      delai_max: Number(formResto.delai_max) || 0,
+      frais_livraison: Number(formResto.frais_livraison) || 0,
+      distance_km: Number(formResto.distance_km) || 0,
+    };
     try {
       if (restaurant) {
-        const { data } = await api.put(`/restaurants/${restaurant.id}`, formResto);
+        const { data } = await api.put(`/restaurants/${restaurant.id}`, charge);
         setRestaurant(data);
         setSucces('Profil du restaurant mis à jour ✅');
       } else {
-        const { data } = await api.post('/restaurants', formResto);
+        const { data } = await api.post('/restaurants', charge);
         setRestaurant(data);
         setSucces('Restaurant créé ! Ajoutez maintenant vos premiers plats 🍽️');
       }
@@ -170,6 +185,33 @@ function TableauRestaurateur() {
                 value={formResto.horaires} onChange={(e) => modifierResto('horaires', e.target.value)} />
             </div>
           </div>
+
+          {/* Infos de livraison utilisées pour la comparaison côté client. */}
+          <div className="ef-grid-2">
+            <div className="ef-field">
+              <label className="ef-label" htmlFor="r-dmin">Délai min (min)</label>
+              <input id="r-dmin" type="number" min="0" className="ef-input"
+                value={formResto.delai_min} onChange={(e) => modifierResto('delai_min', e.target.value)} />
+            </div>
+            <div className="ef-field">
+              <label className="ef-label" htmlFor="r-dmax">Délai max (min)</label>
+              <input id="r-dmax" type="number" min="0" className="ef-input"
+                value={formResto.delai_max} onChange={(e) => modifierResto('delai_max', e.target.value)} />
+            </div>
+          </div>
+          <div className="ef-grid-2">
+            <div className="ef-field">
+              <label className="ef-label" htmlFor="r-frais">Frais de livraison (XAF)</label>
+              <input id="r-frais" type="number" min="0" className="ef-input"
+                value={formResto.frais_livraison} onChange={(e) => modifierResto('frais_livraison', e.target.value)} />
+            </div>
+            <div className="ef-field">
+              <label className="ef-label" htmlFor="r-dist">Distance (km)</label>
+              <input id="r-dist" type="number" min="0" step="0.1" className="ef-input"
+                value={formResto.distance_km} onChange={(e) => modifierResto('distance_km', e.target.value)} />
+            </div>
+          </div>
+
           <button type="submit" className="ef-btn ef-btn-primary">
             {restaurant ? 'Enregistrer les modifications' : 'Créer mon restaurant'}
           </button>
