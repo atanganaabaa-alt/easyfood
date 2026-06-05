@@ -63,6 +63,39 @@
 }
 .ef-nav-link:hover { color: var(--ef-vert); }
 
+/* ----- Bouton panier ----- */
+.ef-cart-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--ef-noir);
+  color: #fff;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.ef-cart-btn:hover { background: var(--ef-noir-doux); }
+.ef-cart-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--ef-vert);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  min-width: 19px;
+  height: 19px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border: 2px solid #fff;
+}
+
 .ef-nav-user {
   display: flex;
   align-items: center;

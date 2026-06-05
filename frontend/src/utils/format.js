@@ -17,6 +17,27 @@ export function formaterDelai(min, max) {
   return `${min}-${max} min`;
 }
 
+// Libellé lisible + classe de couleur pour un statut de commande.
+export function infoStatut(statut) {
+  const map = {
+    en_attente: { label: 'En attente', classe: 'attente' },
+    acceptee: { label: 'Acceptée', classe: 'acceptee' },
+    en_preparation: { label: 'En préparation', classe: 'preparation' },
+    prete: { label: 'Prête', classe: 'prete' },
+    livree: { label: 'Livrée', classe: 'livree' },
+    annulee: { label: 'Annulée', classe: 'annulee' },
+  };
+  return map[statut] || { label: statut, classe: 'attente' };
+}
+
+// Formate une date ISO en format lisible court (ex: "5 juin 2026 à 21:50").
+export function formaterDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleString('fr-FR', {
+    day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  });
+}
+
 // Calcule un score de comparaison : plus il est BAS, meilleur est le restaurant.
 // On combine le délai de livraison, la distance et les frais, ajustés par la note.
 export function scoreComparaison(r) {

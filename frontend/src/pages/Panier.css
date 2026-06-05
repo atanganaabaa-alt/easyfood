@@ -1,0 +1,99 @@
+.ef-panier-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.ef-panier-items { padding: 8px 20px; }
+
+.ef-panier-ligne {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--ef-bordure);
+}
+.ef-panier-ligne:last-child { border-bottom: none; }
+
+.ef-panier-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+.ef-panier-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.95rem;
+}
+
+/* Sélecteur de quantité */
+.ef-qte {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1.5px solid var(--ef-bordure);
+  border-radius: 999px;
+  padding: 4px 6px;
+}
+.ef-qte-btn {
+  border: none;
+  background: var(--ef-gris-clair);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1;
+}
+.ef-qte-btn:hover { background: #e4e4e4; }
+.ef-qte-val { min-width: 18px; text-align: center; font-weight: 700; }
+
+.ef-panier-prix {
+  font-weight: 700;
+  min-width: 90px;
+  text-align: right;
+}
+.ef-panier-suppr {
+  border: none;
+  background: transparent;
+  color: var(--ef-gris);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px;
+}
+.ef-panier-suppr:hover { color: var(--ef-rouge); }
+
+/* Récapitulatif */
+.ef-recap { padding: 22px; position: sticky; top: 90px; }
+.ef-recap h3 { font-size: 1.2rem; margin-bottom: 16px; }
+.ef-recap-ligne {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: var(--ef-gris);
+}
+.ef-recap-total {
+  border-top: 1px solid var(--ef-bordure);
+  padding-top: 12px;
+  margin-top: 12px;
+  color: var(--ef-texte);
+  font-weight: 800;
+  font-size: 1.15rem;
+}
+.ef-vider { margin-top: 8px; color: var(--ef-gris); }
+
+/* État panier vide */
+.ef-empty { padding: 60px 20px; }
+.ef-empty-emoji { font-size: 4rem; margin-bottom: 10px; }
+
+@media (max-width: 720px) {
+  .ef-panier-grid { grid-template-columns: 1fr; }
+  .ef-recap { position: static; }
+}

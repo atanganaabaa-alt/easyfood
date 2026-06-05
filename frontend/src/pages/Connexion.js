@@ -32,7 +32,7 @@ function Connexion() {
   return (
     <div className="ef-auth-wrap">
       <div className="ef-card ef-auth-card">
-        <h1 className="ef-auth-title">Content de vous revoir 🤗</h1>
+        <h1 className="ef-auth-title">Content de vous revoir</h1>
         <p className="ef-auth-subtitle">Connectez-vous pour commander vos plats préférés.</p>
 
         {erreur && <div className="ef-alert ef-alert-error">{erreur}</div>}

@@ -7,6 +7,10 @@ import Connexion from './pages/Connexion';
 import Restaurants from './pages/Restaurants';
 import RestaurantDetail from './pages/RestaurantDetail';
 import TableauRestaurateur from './pages/TableauRestaurateur';
+import Panier from './pages/Panier';
+import Checkout from './pages/Checkout';
+import MesCommandes from './pages/MesCommandes';
+import CommandesRestaurateur from './pages/CommandesRestaurateur';
 import { useAuth } from './context/AuthContext';
 
 // Garde de route : réserve une page à un rôle précis (ici le restaurateur).
@@ -32,11 +36,36 @@ function App() {
           <Route path="/connexion" element={<Connexion />} />
           <Route path="/restaurants" element={<Restaurants />} />
           <Route path="/restaurants/:id" element={<RestaurantDetail />} />
+          <Route path="/panier" element={<Panier />} />
+          <Route
+            path="/checkout"
+            element={
+              <RouteProtegee>
+                <Checkout />
+              </RouteProtegee>
+            }
+          />
+          <Route
+            path="/mes-commandes"
+            element={
+              <RouteProtegee>
+                <MesCommandes />
+              </RouteProtegee>
+            }
+          />
           <Route
             path="/restaurateur"
             element={
               <RouteProtegee role="restaurateur">
                 <TableauRestaurateur />
+              </RouteProtegee>
+            }
+          />
+          <Route
+            path="/restaurateur/commandes"
+            element={
+              <RouteProtegee role="restaurateur">
+                <CommandesRestaurateur />
               </RouteProtegee>
             }
           />

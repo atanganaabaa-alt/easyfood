@@ -7,7 +7,9 @@
 -- ============================================================
 
 -- On supprime les tables existantes pour pouvoir relancer le script proprement.
--- L'ordre tient compte des clés étrangères (les plats dépendent des restaurants).
+-- L'ordre tient compte des clés étrangères (les enfants avant les parents).
+DROP TABLE IF EXISTS commande_items CASCADE;
+DROP TABLE IF EXISTS commandes CASCADE;
 DROP TABLE IF EXISTS plats CASCADE;
 DROP TABLE IF EXISTS restaurants CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
@@ -64,3 +66,45 @@ CREATE TABLE plats (
 -- Index pour accélérer la recherche des plats d'un restaurant.
 CREATE INDEX idx_plats_restaurant ON plats(restaurant_id);
 CREATE INDEX idx_restaurants_proprietaire ON restaurants(proprietaire_id);
+
+-- ------------------------------------------------------------
+-- Table des commandes (Sprint 2)
+-- Une commande = un client qui commande dans UN restaurant.
+-- ------------------------------------------------------------
+CREATE TABLE commandes (
+  id                 SERIAL PRIMARY KEY,
+  client_id          INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  restaurant_id      INTEGER NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+  adresse_livraison  VARCHAR(255) NOT NULL,
+  telephone          VARCHAR(30) NOT NULL,
+  sous_total         INTEGER NOT NULL,                  -- somme des plats (XAF)
+  frais_livraison    INTEGER NOT NULL DEFAULT 0,        -- frais de livraison (XAF)
+  total              INTEGER NOT NULL,                  -- sous_total + frais_livraison
+  mode_paiement      VARCHAR(20) NOT NULL               -- 'orange_money' | 'mtn_momo'
+                     CHECK (mode_paiement IN ('orange_money', 'mtn_momo')),
+  statut_paiement    VARCHAR(20) NOT NULL DEFAULT 'en_attente'
+                     CHECK (statut_paiement IN ('en_attente', 'paye', 'echoue')),
+  reference_paiement VARCHAR(80),                       -- référence renvoyée par l'opérateur
+  -- Cycle de vie de la commande, géré par le restaurateur :
+  statut             VARCHAR(20) NOT NULL DEFAULT 'en_attente'
+                     CHECK (statut IN ('en_attente', 'acceptee', 'en_preparation', 'prete', 'livree', 'annulee')),
+  created_at         TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- ------------------------------------------------------------
+-- Lignes de commande : chaque plat commandé avec sa quantité.
+-- On copie le nom et le prix au moment de la commande (historique fiable
+-- même si le plat change ou est supprimé plus tard).
+-- ------------------------------------------------------------
+CREATE TABLE commande_items (
+  id            SERIAL PRIMARY KEY,
+  commande_id   INTEGER NOT NULL REFERENCES commandes(id) ON DELETE CASCADE,
+  plat_id       INTEGER REFERENCES plats(id) ON DELETE SET NULL,
+  nom_plat      VARCHAR(150) NOT NULL,
+  prix_unitaire INTEGER NOT NULL,
+  quantite      INTEGER NOT NULL CHECK (quantite > 0)
+);
+
+CREATE INDEX idx_commandes_client ON commandes(client_id);
+CREATE INDEX idx_commandes_restaurant ON commandes(restaurant_id);
+CREATE INDEX idx_commande_items_commande ON commande_items(commande_id);

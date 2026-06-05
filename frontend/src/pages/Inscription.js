@@ -46,7 +46,7 @@ function Inscription() {
   return (
     <div className="ef-auth-wrap">
       <div className="ef-card ef-auth-card">
-        <h1 className="ef-auth-title">Bienvenue sur EasyFood 🎉</h1>
+        <h1 className="ef-auth-title">Bienvenue sur EasyFood</h1>
         <p className="ef-auth-subtitle">Créez votre compte en quelques secondes.</p>
 
         {erreur && <div className="ef-alert ef-alert-error">{erreur}</div>}

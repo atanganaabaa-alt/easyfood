@@ -74,3 +74,8 @@
   font-size: 0.9rem;
   margin: 6px 0 12px;
 }
+
+/* Bouton "Ajouter" passant brièvement en vert après ajout. */
+.ef-btn-ok {
+  background: var(--ef-vert) !important;
+}

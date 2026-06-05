@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import ImageUpload from '../components/ImageUpload';
 import { formaterPrix } from '../utils/format';
 import './TableauRestaurateur.css';
 
@@ -82,11 +83,11 @@ function TableauRestaurateur() {
       if (restaurant) {
         const { data } = await api.put(`/restaurants/${restaurant.id}`, charge);
         setRestaurant(data);
-        setSucces('Profil du restaurant mis à jour ✅');
+        setSucces('Profil du restaurant mis à jour.');
       } else {
         const { data } = await api.post('/restaurants', charge);
         setRestaurant(data);
-        setSucces('Restaurant créé ! Ajoutez maintenant vos premiers plats 🍽️');
+        setSucces('Restaurant créé. Ajoutez maintenant vos premiers plats.');
       }
     } catch (err) {
       setErreur(err.response?.data?.message || "Enregistrement impossible.");
@@ -106,7 +107,7 @@ function TableauRestaurateur() {
       });
       setPlats((prev) => [data, ...prev]);
       setFormPlat(PLAT_VIDE);
-      setSucces('Plat ajouté au menu 🎉');
+      setSucces('Plat ajouté au menu.');
     } catch (err) {
       setErreur(err.response?.data?.message || "Ajout du plat impossible.");
     }
@@ -145,7 +146,7 @@ function TableauRestaurateur() {
   return (
     <div className="ef-container ef-page ef-dash">
       <div className="ef-page-head">
-        <h1>Mon restaurant 👨‍🍳</h1>
+        <h1>Mon restaurant</h1>
         <p className="ef-text-muted">
           Bonjour {user.nom?.split(' ')[0]}, gérez ici votre vitrine et votre menu.
         </p>
@@ -173,9 +174,15 @@ function TableauRestaurateur() {
             <textarea id="r-desc" className="ef-textarea" placeholder="Présentez votre cuisine en quelques mots..."
               value={formResto.description} onChange={(e) => modifierResto('description', e.target.value)} />
           </div>
+          {/* Import du logo / photo du restaurant. */}
+          <ImageUpload
+            label="Logo / photo du restaurant"
+            value={formResto.logo_url}
+            onChange={(url) => modifierResto('logo_url', url)}
+          />
           <div className="ef-grid-2">
             <div className="ef-field">
-              <label className="ef-label" htmlFor="r-logo">Logo / photo (URL)</label>
+              <label className="ef-label" htmlFor="r-logo">…ou collez une URL d'image</label>
               <input id="r-logo" className="ef-input" placeholder="https://..."
                 value={formResto.logo_url} onChange={(e) => modifierResto('logo_url', e.target.value)} />
             </div>
@@ -221,7 +228,7 @@ function TableauRestaurateur() {
       {/* ---- Gestion du menu (uniquement si le restaurant existe) ---- */}
       {restaurant && (
         <section className="ef-card ef-dash-card">
-          <h2>Mon menu 🍽️</h2>
+          <h2>Mon menu</h2>
 
           <form onSubmit={ajouterPlat} className="ef-plat-form">
             <div className="ef-grid-2">
@@ -241,12 +248,17 @@ function TableauRestaurateur() {
               <input id="p-desc" className="ef-input" placeholder="Ex : Plat traditionnel, sauce d'arachide..."
                 value={formPlat.description} onChange={(e) => modifierPlat('description', e.target.value)} />
             </div>
+            <ImageUpload
+              label="Photo du plat"
+              value={formPlat.photo_url}
+              onChange={(url) => modifierPlat('photo_url', url)}
+            />
             <div className="ef-field">
-              <label className="ef-label" htmlFor="p-photo">Photo (URL)</label>
+              <label className="ef-label" htmlFor="p-photo">…ou collez une URL d'image</label>
               <input id="p-photo" className="ef-input" placeholder="https://..."
                 value={formPlat.photo_url} onChange={(e) => modifierPlat('photo_url', e.target.value)} />
             </div>
-            <button type="submit" className="ef-btn ef-btn-primary">+ Ajouter le plat</button>
+            <button type="submit" className="ef-btn ef-btn-primary">Ajouter le plat</button>
           </form>
 
           {plats.length === 0 ? (

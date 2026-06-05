@@ -84,7 +84,7 @@ function Restaurants() {
   return (
     <div className="ef-container ef-page">
       <div className="ef-page-head">
-        <h1>Trouvez le meilleur restaurant 🍴</h1>
+        <h1>Trouvez le meilleur restaurant</h1>
         <p className="ef-text-muted">
           Comparez les prix, les délais et la distance, puis commandez en un clic.
         </p>

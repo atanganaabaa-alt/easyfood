@@ -1,0 +1,84 @@
+.ef-upload { margin-bottom: 16px; }
+
+.ef-upload-row {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+
+/* Zone de dépôt */
+.ef-dropzone {
+  flex: 1;
+  border: 2px dashed var(--ef-bordure);
+  border-radius: 12px;
+  padding: 22px 16px;
+  text-align: center;
+  cursor: pointer;
+  background: #fcfcfc;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.ef-dropzone:hover,
+.ef-dropzone.survol {
+  border-color: var(--ef-noir);
+  background: var(--ef-gris-clair);
+}
+.ef-dropzone-icone {
+  font-size: 1.6rem;
+  color: var(--ef-gris);
+  margin-bottom: 6px;
+}
+.ef-dropzone-texte {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.ef-dropzone-hint {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  color: var(--ef-gris);
+}
+
+/* Aperçu */
+.ef-upload-apercu {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--ef-bordure);
+}
+.ef-upload-apercu img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.ef-upload-retirer {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ef-upload-retirer:hover { background: rgba(0, 0, 0, 0.85); }
+
+.ef-upload-erreur {
+  color: var(--ef-rouge);
+  font-size: 0.85rem;
+  margin: 8px 0 0;
+}
+
+@media (max-width: 520px) {
+  .ef-upload-row { flex-direction: column; }
+  .ef-upload-apercu { width: 100%; height: 160px; }
+}

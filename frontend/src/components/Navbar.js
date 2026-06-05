@@ -2,10 +2,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import './Navbar.css';
 
 function Navbar() {
   const { user, logout } = useAuth();
+  const { nombreArticles } = useCart();
   const navigate = useNavigate();
   const [recherche, setRecherche] = useState('');
 
@@ -43,14 +45,28 @@ function Navbar() {
         </form>
 
         <nav className="ef-nav-links">
-          {/* Lien vers le tableau de bord réservé aux restaurateurs. */}
+          {/* Liens réservés au restaurateur. */}
           {user?.role === 'restaurateur' && (
-            <Link to="/restaurateur" className="ef-nav-link">Mon restaurant</Link>
+            <>
+              <Link to="/restaurateur" className="ef-nav-link">Mon restaurant</Link>
+              <Link to="/restaurateur/commandes" className="ef-nav-link">Commandes</Link>
+            </>
           )}
+
+          {/* Historique réservé aux clients connectés. */}
+          {user && user.role === 'client' && (
+            <Link to="/mes-commandes" className="ef-nav-link">Mes commandes</Link>
+          )}
+
+          {/* Bouton panier (visible pour tous). */}
+          <Link to="/panier" className="ef-cart-btn" aria-label="Panier">
+            <span aria-hidden="true">🛒</span>
+            {nombreArticles > 0 && <span className="ef-cart-count">{nombreArticles}</span>}
+          </Link>
 
           {user ? (
             <div className="ef-nav-user">
-              <span className="ef-nav-hello">Bonjour, {user.nom?.split(' ')[0]} 👋</span>
+              <span className="ef-nav-hello">Bonjour, {user.nom?.split(' ')[0]}</span>
               <button className="ef-btn ef-btn-outline ef-btn-sm" onClick={seDeconnecter}>
                 Déconnexion
               </button>

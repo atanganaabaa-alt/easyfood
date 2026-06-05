@@ -19,6 +19,10 @@ backend/.env
 frontend/build/
 /build/
 
+# Fichiers importés par les utilisateurs (on garde le dossier, pas son contenu)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
 # Tests / couverture
 /coverage
 

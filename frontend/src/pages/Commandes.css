@@ -1,0 +1,73 @@
+/* Styles partagés par les pages de commandes (client & restaurateur). */
+
+.ef-cmd-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 760px;
+}
+
+.ef-cmd-card { padding: 20px 22px; }
+
+/* Surbrillance des nouvelles commandes côté restaurateur. */
+.ef-cmd-nouvelle {
+  border-color: var(--ef-vert);
+  box-shadow: 0 0 0 2px rgba(31, 157, 87, 0.18);
+}
+
+.ef-cmd-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.ef-cmd-date { font-size: 0.82rem; margin-top: 2px; }
+.ef-cmd-resto { font-weight: 600; }
+
+/* Liste des plats de la commande */
+.ef-cmd-items {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--ef-bordure);
+  border-bottom: 1px solid var(--ef-bordure);
+}
+.ef-cmd-items li {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 0.92rem;
+}
+
+.ef-cmd-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+}
+
+.ef-cmd-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+/* ----- Badges de statut ----- */
+.ef-statut {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ef-statut-attente { background: #fff3d6; color: #a76f00; }
+.ef-statut-acceptee { background: #e0ecff; color: #1d4ed8; }
+.ef-statut-preparation { background: #ffe9d6; color: #c2410c; }
+.ef-statut-prete { background: rgba(31, 157, 87, 0.14); color: var(--ef-vert-fonce); }
+.ef-statut-livree { background: #e8e8e8; color: #444; }
+.ef-statut-annulee { background: rgba(226, 55, 68, 0.1); color: var(--ef-rouge); }
