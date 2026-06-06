@@ -69,5 +69,91 @@
 .ef-statut-acceptee { background: #e0ecff; color: #1d4ed8; }
 .ef-statut-preparation { background: #ffe9d6; color: #c2410c; }
 .ef-statut-prete { background: rgba(31, 157, 87, 0.14); color: var(--ef-vert-fonce); }
+.ef-statut-livraison { background: #e7e0ff; color: #6d28d9; }
 .ef-statut-livree { background: #e8e8e8; color: #444; }
 .ef-statut-annulee { background: rgba(226, 55, 68, 0.1); color: var(--ef-rouge); }
+
+/* Titres de section (espace livreur, suivi). */
+.ef-section-title {
+  font-size: 1.15rem;
+  margin: 0 0 14px;
+}
+.ef-mb { margin-bottom: 32px; }
+
+/* ----- Timeline de suivi de commande (client) ----- */
+.ef-suivi {
+  display: flex;
+  align-items: flex-start;
+  margin: 16px 0 4px;
+}
+.ef-suivi-etape {
+  flex: 1;
+  text-align: center;
+  position: relative;
+  font-size: 0.78rem;
+  color: var(--ef-gris);
+}
+/* Trait reliant les étapes. */
+.ef-suivi-etape::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: -50%;
+  width: 100%;
+  height: 3px;
+  background: var(--ef-bordure);
+  z-index: 0;
+}
+.ef-suivi-etape:first-child::before { display: none; }
+.ef-suivi-pastille {
+  position: relative;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--ef-bordure);
+  margin: 0 auto 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.7rem;
+}
+.ef-suivi-etape.faite .ef-suivi-pastille { background: var(--ef-vert); }
+.ef-suivi-etape.faite::before { background: var(--ef-vert); }
+.ef-suivi-etape.active .ef-suivi-pastille {
+  background: var(--ef-noir);
+  box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.12);
+}
+.ef-suivi-etape.faite, .ef-suivi-etape.active { color: var(--ef-texte); font-weight: 600; }
+.ef-suivi-annulee {
+  color: var(--ef-rouge);
+  font-weight: 600;
+  margin: 12px 0;
+}
+
+/* ----- Notation (étoiles) ----- */
+.ef-eval-bloc {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ef-bordure);
+}
+.ef-stars { display: inline-flex; gap: 2px; }
+.ef-star {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.45rem;
+  line-height: 1;
+  color: #d8d8d8;
+  padding: 0 1px;
+}
+.ef-star.pleine { color: var(--ef-jaune); }
+.ef-eval-ligne { margin-bottom: 10px; }
+.ef-eval-ligne .ef-label { display: block; margin-bottom: 2px; }
+.ef-eval-merci { color: var(--ef-vert-fonce); font-weight: 600; }
+.ef-livreur-info {
+  font-size: 0.85rem;
+  color: var(--ef-gris);
+  margin-top: 6px;
+}

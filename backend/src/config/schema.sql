@@ -8,6 +8,7 @@
 
 -- On supprime les tables existantes pour pouvoir relancer le script proprement.
 -- L'ordre tient compte des clés étrangères (les enfants avant les parents).
+DROP TABLE IF EXISTS evaluations CASCADE;
 DROP TABLE IF EXISTS commande_items CASCADE;
 DROP TABLE IF EXISTS commandes CASCADE;
 DROP TABLE IF EXISTS plats CASCADE;
@@ -25,6 +26,9 @@ CREATE TABLE users (
   telephone     VARCHAR(30),
   role          VARCHAR(20) NOT NULL DEFAULT 'client'
                 CHECK (role IN ('client', 'restaurateur', 'livreur', 'admin')),
+  -- Note moyenne du livreur (Sprint 3), alimentée par les évaluations des clients.
+  note          NUMERIC(2,1) NOT NULL DEFAULT 0,
+  nb_courses    INTEGER NOT NULL DEFAULT 0,     -- nombre de livraisons terminées
   created_at    TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
@@ -44,6 +48,10 @@ CREATE TABLE restaurants (
   delai_max       INTEGER NOT NULL DEFAULT 40,        -- délai de livraison maximum (minutes)
   frais_livraison INTEGER NOT NULL DEFAULT 0,         -- frais de livraison en XAF
   distance_km     NUMERIC(4,1) NOT NULL DEFAULT 0,    -- distance approximative en km
+  -- Coordonnées GPS pour la géolocalisation (Sprint 3) : trouver les restaurants proches.
+  latitude        NUMERIC(9,6),
+  longitude       NUMERIC(9,6),
+  nb_evaluations  INTEGER NOT NULL DEFAULT 0,         -- nombre d'avis reçus
   proprietaire_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   created_at      TIMESTAMP NOT NULL DEFAULT NOW()
 );
@@ -85,9 +93,11 @@ CREATE TABLE commandes (
   statut_paiement    VARCHAR(20) NOT NULL DEFAULT 'en_attente'
                      CHECK (statut_paiement IN ('en_attente', 'paye', 'echoue')),
   reference_paiement VARCHAR(80),                       -- référence renvoyée par l'opérateur
-  -- Cycle de vie de la commande, géré par le restaurateur :
+  -- Cycle de vie de la commande : restaurateur (jusqu'à "prete") puis livreur ("en_livraison" -> "livree").
   statut             VARCHAR(20) NOT NULL DEFAULT 'en_attente'
-                     CHECK (statut IN ('en_attente', 'acceptee', 'en_preparation', 'prete', 'livree', 'annulee')),
+                     CHECK (statut IN ('en_attente', 'acceptee', 'en_preparation', 'prete', 'en_livraison', 'livree', 'annulee')),
+  -- Livreur affecté à la commande (Sprint 3). NULL tant qu'aucun livreur n'a pris la mission.
+  livreur_id         INTEGER REFERENCES users(id) ON DELETE SET NULL,
   created_at         TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
@@ -107,4 +117,24 @@ CREATE TABLE commande_items (
 
 CREATE INDEX idx_commandes_client ON commandes(client_id);
 CREATE INDEX idx_commandes_restaurant ON commandes(restaurant_id);
+CREATE INDEX idx_commandes_livreur ON commandes(livreur_id);
 CREATE INDEX idx_commande_items_commande ON commande_items(commande_id);
+
+-- ------------------------------------------------------------
+-- Évaluations (Sprint 3) : après livraison, le client note le restaurant
+-- et le livreur. Une seule évaluation par commande.
+-- ------------------------------------------------------------
+CREATE TABLE evaluations (
+  id              SERIAL PRIMARY KEY,
+  commande_id     INTEGER UNIQUE NOT NULL REFERENCES commandes(id) ON DELETE CASCADE,
+  client_id       INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  restaurant_id   INTEGER NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+  livreur_id      INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  note_restaurant INTEGER NOT NULL CHECK (note_restaurant BETWEEN 1 AND 5),
+  note_livreur    INTEGER CHECK (note_livreur BETWEEN 1 AND 5),
+  commentaire     TEXT,
+  created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_evaluations_restaurant ON evaluations(restaurant_id);
+CREATE INDEX idx_evaluations_livreur ON evaluations(livreur_id);

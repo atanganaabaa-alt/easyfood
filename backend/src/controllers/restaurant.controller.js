@@ -36,7 +36,7 @@ exports.create = async (req, res) => {
 
   const {
     nom, adresse, description, logo_url, horaires,
-    delai_min, delai_max, frais_livraison, distance_km,
+    delai_min, delai_max, frais_livraison, distance_km, latitude, longitude,
   } = req.body;
   if (!nom || !adresse) {
     return res.status(400).json({ message: 'Nom et adresse sont obligatoires.' });
@@ -45,11 +45,12 @@ exports.create = async (req, res) => {
   try {
     const result = await pool.query(
       `INSERT INTO restaurants
-         (nom, adresse, description, logo_url, horaires, delai_min, delai_max, frais_livraison, distance_km, proprietaire_id)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
+         (nom, adresse, description, logo_url, horaires, delai_min, delai_max, frais_livraison, distance_km, latitude, longitude, proprietaire_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
       [
         nom, adresse, description, logo_url, horaires,
         delai_min || 20, delai_max || 40, frais_livraison || 0, distance_km || 0,
+        latitude || null, longitude || null,
         req.user.id,
       ]
     );
@@ -63,7 +64,7 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   const {
     nom, adresse, description, logo_url, horaires,
-    delai_min, delai_max, frais_livraison, distance_km,
+    delai_min, delai_max, frais_livraison, distance_km, latitude, longitude,
   } = req.body;
   try {
     const check = await pool.query('SELECT * FROM restaurants WHERE id = $1', [req.params.id]);
@@ -77,14 +78,17 @@ exports.update = async (req, res) => {
     const result = await pool.query(
       `UPDATE restaurants SET
          nom=$1, adresse=$2, description=$3, logo_url=$4, horaires=$5,
-         delai_min=$6, delai_max=$7, frais_livraison=$8, distance_km=$9
-       WHERE id=$10 RETURNING *`,
+         delai_min=$6, delai_max=$7, frais_livraison=$8, distance_km=$9,
+         latitude=$10, longitude=$11
+       WHERE id=$12 RETURNING *`,
       [
         nom, adresse, description, logo_url, horaires,
         delai_min ?? actuel.delai_min,
         delai_max ?? actuel.delai_max,
         frais_livraison ?? actuel.frais_livraison,
         distance_km ?? actuel.distance_km,
+        latitude ?? actuel.latitude,
+        longitude ?? actuel.longitude,
         req.params.id,
       ]
     );

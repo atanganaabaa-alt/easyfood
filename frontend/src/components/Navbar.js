@@ -58,6 +58,11 @@ function Navbar() {
             <Link to="/mes-commandes" className="ef-nav-link">Mes commandes</Link>
           )}
 
+          {/* Espace réservé aux livreurs. */}
+          {user?.role === 'livreur' && (
+            <Link to="/livreur" className="ef-nav-link">Mes livraisons</Link>
+          )}
+
           {/* Bouton panier (visible pour tous). */}
           <Link to="/panier" className="ef-cart-btn" aria-label="Panier">
             <span aria-hidden="true">🛒</span>

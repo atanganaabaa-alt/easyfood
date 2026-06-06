@@ -11,6 +11,7 @@ import Panier from './pages/Panier';
 import Checkout from './pages/Checkout';
 import MesCommandes from './pages/MesCommandes';
 import CommandesRestaurateur from './pages/CommandesRestaurateur';
+import TableauLivreur from './pages/TableauLivreur';
 import { useAuth } from './context/AuthContext';
 
 // Garde de route : réserve une page à un rôle précis (ici le restaurateur).
@@ -66,6 +67,14 @@ function App() {
             element={
               <RouteProtegee role="restaurateur">
                 <CommandesRestaurateur />
+              </RouteProtegee>
+            }
+          />
+          <Route
+            path="/livreur"
+            element={
+              <RouteProtegee role="livreur">
+                <TableauLivreur />
               </RouteProtegee>
             }
           />

@@ -8,6 +8,30 @@
   margin-bottom: 20px;
 }
 
+/* ----- Barre de géolocalisation ----- */
+.ef-geo-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.ef-geo-actif {
+  font-size: 0.85rem;
+  color: var(--ef-vert-fonce);
+  font-weight: 600;
+}
+
+/* ----- Carte ----- */
+.ef-carte {
+  height: 360px;
+  border-radius: var(--ef-radius);
+  overflow: hidden;
+  border: 1px solid var(--ef-bordure);
+  margin-bottom: 24px;
+}
+.ef-carte .leaflet-container { font: inherit; }
+
 /* ----- Chips de tri (comparaison) ----- */
 .ef-chips {
   display: flex;

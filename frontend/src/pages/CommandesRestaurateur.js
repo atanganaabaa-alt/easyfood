@@ -13,7 +13,7 @@ const ACTIONS = {
   ],
   acceptee: [{ statut: 'en_preparation', label: 'Commencer la préparation', primaire: true }],
   en_preparation: [{ statut: 'prete', label: 'Marquer comme prête', primaire: true }],
-  prete: [{ statut: 'livree', label: 'Marquer comme livrée', primaire: true }],
+  // Une fois "prête", un livreur prend le relais : plus d'action côté restaurateur.
 };
 
 function CommandesRestaurateur() {
@@ -55,8 +55,8 @@ function CommandesRestaurateur() {
     }
   };
 
-  // Nombre de commandes nécessitant une action (nouvelles ou en cours).
-  const enCours = commandes.filter((c) => ['en_attente', 'acceptee', 'en_preparation', 'prete'].includes(c.statut)).length;
+  // Nombre de commandes nécessitant une action du restaurateur.
+  const enCours = commandes.filter((c) => ['en_attente', 'acceptee', 'en_preparation'].includes(c.statut)).length;
 
   return (
     <div className="ef-container ef-page">
@@ -103,6 +103,16 @@ function CommandesRestaurateur() {
                 <span className="ef-text-muted">📍 {c.adresse_livraison} · 📞 {c.telephone}</span>
                 <strong>Total : {formaterPrix(c.total)}</strong>
               </div>
+
+              {/* Statut de livraison une fois la commande prête. */}
+              {c.statut === 'prete' && (
+                <p className="ef-livreur-info">En attente qu'un livreur prenne la commande.</p>
+              )}
+              {(c.statut === 'en_livraison' || c.statut === 'livree') && c.livreur_nom && (
+                <p className="ef-livreur-info">
+                  {c.statut === 'livree' ? 'Livrée par' : 'En cours de livraison par'} {c.livreur_nom}.
+                </p>
+              )}
 
               {actions.length > 0 && (
                 <div className="ef-cmd-actions">

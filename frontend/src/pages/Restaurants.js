@@ -1,8 +1,12 @@
-// Page liste des restaurants : recherche, tri (comparaison) et badge "Meilleur choix".
+// Page liste des restaurants : recherche, tri (comparaison), badge "Meilleur choix"
+// et carte géographique pour trouver les restaurants proches de soi.
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
-import { formaterFrais, formaterDelai, scoreComparaison } from '../utils/format';
+import CarteRestaurants from '../components/CarteRestaurants';
+import {
+  formaterFrais, formaterDelai, scoreComparaison, distanceKm, fraisDepuisDistance,
+} from '../utils/format';
 import './Restaurants.css';
 
 // Image par défaut si un restaurant n'a pas de logo.
@@ -25,6 +29,11 @@ function Restaurants() {
   const [tri, setTri] = useState('meilleur');
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState('');
+  // Position du client (géolocalisation ou clic sur la carte).
+  const [position, setPosition] = useState(null);
+  const [geoErreur, setGeoErreur] = useState('');
+  const [geoChargement, setGeoChargement] = useState(false);
+  const [carteVisible, setCarteVisible] = useState(false);
 
   // Récupère la liste des restaurants au chargement de la page.
   useEffect(() => {
@@ -46,17 +55,55 @@ function Restaurants() {
     setRecherche(searchParams.get('q') || '');
   }, [searchParams]);
 
+  // Demande la position du navigateur (géolocalisation).
+  const utiliserMaPosition = () => {
+    if (!navigator.geolocation) {
+      setGeoErreur("La géolocalisation n'est pas disponible sur cet appareil.");
+      return;
+    }
+    setGeoErreur('');
+    setGeoChargement(true);
+    setCarteVisible(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setGeoChargement(false);
+      },
+      () => {
+        setGeoErreur("Impossible d'obtenir votre position. Vous pouvez la choisir sur la carte.");
+        setGeoChargement(false);
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  };
+
+  // Recalcule distance et frais depuis la position du client (si connue).
+  const restaurantsEnrichis = useMemo(() => {
+    if (!position) return restaurants;
+    return restaurants.map((r) => {
+      if (r.latitude == null || r.longitude == null) return r;
+      const dist = distanceKm(position.lat, position.lng, Number(r.latitude), Number(r.longitude));
+      if (dist == null) return r;
+      return {
+        ...r,
+        distance_km: Number(dist.toFixed(1)),
+        frais_livraison: fraisDepuisDistance(dist),
+        _dynamique: true,
+      };
+    });
+  }, [restaurants, position]);
+
   // Identifiant du restaurant ayant le meilleur score (le plus bas).
   const meilleurId = useMemo(() => {
-    if (restaurants.length === 0) return null;
-    return restaurants.reduce((meilleur, r) =>
+    if (restaurantsEnrichis.length === 0) return null;
+    return restaurantsEnrichis.reduce((meilleur, r) =>
       scoreComparaison(r) < scoreComparaison(meilleur) ? r : meilleur
     ).id;
-  }, [restaurants]);
+  }, [restaurantsEnrichis]);
 
   // Filtre (recherche) puis trie la liste selon le critère choisi.
   const affiches = useMemo(() => {
-    const filtres = restaurants.filter((r) => {
+    const filtres = restaurantsEnrichis.filter((r) => {
       const texte = `${r.nom} ${r.adresse}`.toLowerCase();
       return texte.includes(recherche.toLowerCase());
     });
@@ -79,7 +126,7 @@ function Restaurants() {
         trie.sort((a, b) => scoreComparaison(a) - scoreComparaison(b));
     }
     return trie;
-  }, [restaurants, recherche, tri]);
+  }, [restaurantsEnrichis, recherche, tri]);
 
   return (
     <div className="ef-container ef-page">
@@ -97,6 +144,29 @@ function Restaurants() {
         value={recherche}
         onChange={(e) => setRecherche(e.target.value)}
       />
+
+      {/* Géolocalisation : trouver les restaurants proches et les moins chers. */}
+      <div className="ef-geo-bar">
+        <button className="ef-btn ef-btn-primary ef-btn-sm" onClick={utiliserMaPosition} disabled={geoChargement}>
+          📍 {geoChargement ? 'Localisation...' : 'Restaurants près de moi'}
+        </button>
+        <button className="ef-btn ef-btn-outline ef-btn-sm" onClick={() => setCarteVisible((v) => !v)}>
+          {carteVisible ? 'Masquer la carte' : 'Afficher la carte'}
+        </button>
+        {position && (
+          <span className="ef-geo-actif">Distances et frais calculés depuis votre position.</span>
+        )}
+      </div>
+      {geoErreur && <div className="ef-alert ef-alert-error ef-mt">{geoErreur}</div>}
+
+      {carteVisible && (
+        <CarteRestaurants
+          restaurants={affiches}
+          position={position}
+          onChoisirPosition={(p) => setPosition(p)}
+          meilleurId={meilleurId}
+        />
+      )}
 
       {/* Barre de tri (chips) pour comparer selon différents critères. */}
       <div className="ef-chips">

@@ -34,6 +34,8 @@ const RESTAURANTS = [
     delai_max: 35,
     frais_livraison: 500,
     distance_km: 1.8,
+    latitude: 4.0511,
+    longitude: 9.7679,
     plats: [
       { nom: 'Ndolè aux crevettes', description: 'Le plat national, sauce d\'arachide et crevettes.', prix: 3000, photo_url: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=500' },
       { nom: 'Poisson braisé + bobolo', description: 'Poisson grillé, sauce piment, accompagné de bobolo.', prix: 3500, photo_url: 'https://images.unsplash.com/photo-1535140728325-a4d3707eee61?w=500' },
@@ -52,6 +54,8 @@ const RESTAURANTS = [
     delai_max: 45,
     frais_livraison: 700,
     distance_km: 3.2,
+    latitude: 3.8951,
+    longitude: 11.5021,
     plats: [
       { nom: 'Soya de bœuf', description: 'Brochettes de bœuf marinées et grillées.', prix: 1500, photo_url: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=500' },
       { nom: 'Plantain mûr frit', description: 'Accompagnement sucré et fondant.', prix: 1000, photo_url: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500' },
@@ -69,6 +73,8 @@ const RESTAURANTS = [
     delai_max: 30,
     frais_livraison: 400,
     distance_km: 2.3,
+    latitude: 4.0928,
+    longitude: 9.7376,
     plats: [
       { nom: 'Okok sucré', description: 'Spécialité du Centre, à base de feuilles de manioc.', prix: 2000, photo_url: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=500' },
       { nom: 'Riz sauté', description: 'Riz sauté aux légumes et morceaux de poulet.', prix: 2500, photo_url: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=500' },
@@ -109,11 +115,12 @@ async function seed() {
     for (const r of RESTAURANTS) {
       const resResto = await pool.query(
         `INSERT INTO restaurants
-           (nom, adresse, description, logo_url, horaires, note, delai_min, delai_max, frais_livraison, distance_km, proprietaire_id)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+           (nom, adresse, description, logo_url, horaires, note, delai_min, delai_max, frais_livraison, distance_km, latitude, longitude, proprietaire_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
          RETURNING id`,
         [r.nom, r.adresse, r.description, r.logo_url, r.horaires,
-         r.note, r.delai_min, r.delai_max, r.frais_livraison, r.distance_km, restaurateurId]
+         r.note, r.delai_min, r.delai_max, r.frais_livraison, r.distance_km,
+         r.latitude, r.longitude, restaurateurId]
       );
       const restaurantId = resResto.rows[0].id;
       console.log(`  🏠 Restaurant : ${r.nom}`);
