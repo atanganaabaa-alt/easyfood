@@ -26,10 +26,14 @@ exports.register = async (req, res) => {
     // Chiffrer le mot de passe
     const hash = await bcrypt.hash(mot_de_passe, 10);
 
-    // Insérer l'utilisateur
+    // Les nouveaux restaurateurs doivent être validés par un admin avant mise en ligne.
+    const valide = role !== 'restaurateur';
+
     const result = await pool.query(
-      'INSERT INTO users (nom, email, mot_de_passe, telephone, role) VALUES ($1, $2, $3, $4, $5) RETURNING id, nom, email, role',
-      [nom, email, hash, telephone, role]
+      `INSERT INTO users (nom, email, mot_de_passe, telephone, role, valide)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id, nom, email, role, actif, valide`,
+      [nom, email, hash, telephone, role, valide]
     );
 
     const user = result.rows[0];
@@ -70,6 +74,10 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Email ou mot de passe incorrect.' });
     }
 
+    if (user.actif === false) {
+      return res.status(403).json({ message: 'Votre compte a été suspendu. Contactez le support.' });
+    }
+
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
@@ -79,7 +87,14 @@ exports.login = async (req, res) => {
     res.json({
       message: 'Connexion réussie !',
       token,
-      user: { id: user.id, nom: user.nom, email: user.email, role: user.role }
+      user: {
+        id: user.id,
+        nom: user.nom,
+        email: user.email,
+        role: user.role,
+        actif: user.actif,
+        valide: user.valide,
+      },
     });
 
   } catch (err) {
@@ -92,7 +107,7 @@ exports.login = async (req, res) => {
 exports.profil = async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT id, nom, email, telephone, role, created_at FROM users WHERE id = $1',
+      'SELECT id, nom, email, telephone, role, actif, valide, created_at FROM users WHERE id = $1',
       [req.user.id]
     );
     res.json(result.rows[0]);

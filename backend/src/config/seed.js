@@ -29,6 +29,7 @@ const RESTAURANTS = [
     description: 'Cuisine camerounaise authentique, faite maison avec amour.',
     logo_url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600',
     horaires: 'Lun-Dim : 09h - 22h',
+    categorie: 'Cuisine camerounaise',
     note: 4.8,
     delai_min: 25,
     delai_max: 35,
@@ -49,6 +50,7 @@ const RESTAURANTS = [
     description: 'Spécialiste des grillades et du soya bien épicé.',
     logo_url: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600',
     horaires: 'Mar-Dim : 11h - 23h',
+    categorie: 'Grillades',
     note: 4.6,
     delai_min: 30,
     delai_max: 45,
@@ -68,6 +70,7 @@ const RESTAURANTS = [
     description: 'Plats traditionnels à petits prix, préparés minute.',
     logo_url: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600',
     horaires: 'Lun-Sam : 10h - 21h',
+    categorie: 'Cuisine camerounaise',
     note: 4.4,
     delai_min: 20,
     delai_max: 30,
@@ -115,10 +118,10 @@ async function seed() {
     for (const r of RESTAURANTS) {
       const resResto = await pool.query(
         `INSERT INTO restaurants
-           (nom, adresse, description, logo_url, horaires, note, delai_min, delai_max, frais_livraison, distance_km, latitude, longitude, proprietaire_id)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+           (nom, adresse, description, logo_url, horaires, categorie, note, delai_min, delai_max, frais_livraison, distance_km, latitude, longitude, proprietaire_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
          RETURNING id`,
-        [r.nom, r.adresse, r.description, r.logo_url, r.horaires,
+        [r.nom, r.adresse, r.description, r.logo_url, r.horaires, r.categorie || null,
          r.note, r.delai_min, r.delai_max, r.frais_livraison, r.distance_km,
          r.latitude, r.longitude, restaurateurId]
       );

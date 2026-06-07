@@ -63,6 +63,10 @@ function Navbar() {
             <Link to="/livreur" className="ef-nav-link">Mes livraisons</Link>
           )}
 
+          {user?.role === 'admin' && (
+            <Link to="/admin" className="ef-nav-link">Administration</Link>
+          )}
+
           {/* Bouton panier (visible pour tous). */}
           <Link to="/panier" className="ef-cart-btn" aria-label="Panier">
             <span aria-hidden="true">🛒</span>

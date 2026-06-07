@@ -1,6 +1,7 @@
 const pool = require('../config/db');
 const { initierPaiement } = require('../services/paiement.service');
 const { envoyerNotification } = require('../services/notification.service');
+const { tauxCommission } = require('../services/parametres.service');
 
 // Statuts qu'un restaurateur peut appliquer (il gère jusqu'à "prête",
 // ensuite c'est le livreur qui prend le relais).
@@ -81,6 +82,8 @@ exports.create = async (req, res) => {
 
     const fraisLivraison = restaurant.frais_livraison || 0;
     const total = sousTotal + fraisLivraison;
+    const taux = await tauxCommission();
+    const commission = Math.round(total * taux);
 
     // 1) Paiement mobile money (Orange / MTN).
     const paiement = await initierPaiement({ mode: mode_paiement, telephone, montant: total });
@@ -94,11 +97,11 @@ exports.create = async (req, res) => {
     const resCmd = await client.query(
       `INSERT INTO commandes
          (client_id, restaurant_id, adresse_livraison, telephone, sous_total,
-          frais_livraison, total, mode_paiement, statut_paiement, reference_paiement)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
+          frais_livraison, total, commission, mode_paiement, statut_paiement, reference_paiement)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
       [
         req.user.id, restaurant_id, adresse_livraison, telephone, sousTotal,
-        fraisLivraison, total, mode_paiement, paiement.statut, paiement.reference,
+        fraisLivraison, total, commission, mode_paiement, paiement.statut, paiement.reference,
       ]
     );
     const commande = resCmd.rows[0];

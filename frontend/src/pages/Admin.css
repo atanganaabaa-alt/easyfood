@@ -1,0 +1,132 @@
+/* Back-office administrateur */
+.ef-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.ef-stat-card {
+  padding: 20px;
+  border-radius: var(--ef-radius);
+  background: var(--ef-blanc);
+  border: 1px solid var(--ef-bordure);
+  box-shadow: var(--ef-ombre);
+}
+.ef-stat-card strong {
+  display: block;
+  font-size: 1.65rem;
+  margin: 6px 0 2px;
+  letter-spacing: -0.02em;
+}
+.ef-stat-label {
+  font-size: 0.82rem;
+  color: var(--ef-gris);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ef-admin-section {
+  margin-bottom: 36px;
+}
+.ef-admin-section h2 {
+  font-size: 1.2rem;
+  margin-bottom: 14px;
+}
+
+.ef-admin-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.ef-admin-tab {
+  border: 1.5px solid var(--ef-bordure);
+  background: var(--ef-blanc);
+  border-radius: 999px;
+  padding: 9px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.ef-admin-tab.active {
+  background: var(--ef-noir);
+  color: #fff;
+  border-color: var(--ef-noir);
+}
+
+.ef-user-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--ef-bordure);
+  border-radius: var(--ef-radius);
+  background: var(--ef-blanc);
+}
+.ef-user-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.ef-user-table th,
+.ef-user-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--ef-bordure);
+}
+.ef-user-table th {
+  background: var(--ef-gris-clair);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ef-gris);
+}
+.ef-user-table tr:last-child td { border-bottom: none; }
+
+.ef-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.ef-badge-ok { background: rgba(31, 157, 87, 0.14); color: var(--ef-vert-fonce); }
+.ef-badge-warn { background: #fff3d6; color: #a76f00; }
+.ef-badge-off { background: rgba(226, 55, 68, 0.1); color: var(--ef-rouge); }
+
+.ef-admin-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ef-commission-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+  max-width: 420px;
+}
+.ef-commission-form .ef-field { flex: 1; min-width: 140px; margin: 0; }
+
+.ef-filtres-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  align-items: center;
+}
+.ef-filtres-bar select {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--ef-bordure);
+  background: var(--ef-blanc);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+  .ef-admin-grid { grid-template-columns: 1fr 1fr; }
+  .ef-stat-card strong { font-size: 1.35rem; }
+  .ef-user-table { font-size: 0.82rem; }
+  .ef-user-table th, .ef-user-table td { padding: 10px 8px; }
+}

@@ -35,7 +35,12 @@ function Inscription() {
     setChargement(true);
     try {
       const utilisateur = await register(champs);
-      navigate(utilisateur.role === 'restaurateur' ? '/restaurateur' : '/restaurants');
+      const routes = {
+        restaurateur: '/restaurateur',
+        livreur: '/livreur',
+        admin: '/admin',
+      };
+      navigate(routes[utilisateur.role] || '/restaurants');
     } catch (err) {
       setErreur(err.response?.data?.message || "Inscription impossible. Réessayez.");
     } finally {

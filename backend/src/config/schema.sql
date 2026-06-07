@@ -11,6 +11,7 @@
 DROP TABLE IF EXISTS evaluations CASCADE;
 DROP TABLE IF EXISTS commande_items CASCADE;
 DROP TABLE IF EXISTS commandes CASCADE;
+DROP TABLE IF EXISTS parametres CASCADE;
 DROP TABLE IF EXISTS plats CASCADE;
 DROP TABLE IF EXISTS restaurants CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
@@ -29,6 +30,9 @@ CREATE TABLE users (
   -- Note moyenne du livreur (Sprint 3), alimentée par les évaluations des clients.
   note          NUMERIC(2,1) NOT NULL DEFAULT 0,
   nb_courses    INTEGER NOT NULL DEFAULT 0,     -- nombre de livraisons terminées
+  -- Back-office (Sprint 4) : suspension de compte + validation des restaurateurs.
+  actif         BOOLEAN NOT NULL DEFAULT TRUE,
+  valide        BOOLEAN NOT NULL DEFAULT TRUE,
   created_at    TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
@@ -42,6 +46,7 @@ CREATE TABLE restaurants (
   description     TEXT,
   logo_url        VARCHAR(500),
   horaires        VARCHAR(255),                 -- ex: "Lun-Dim : 09h - 22h"
+  categorie       VARCHAR(60),                  -- ex: "Grillades", "Cuisine camerounaise"
   -- Champs utiles à la comparaison (trouver le meilleur restaurant) :
   note            NUMERIC(2,1) NOT NULL DEFAULT 0,    -- note moyenne sur 5 (ex: 4.8)
   delai_min       INTEGER NOT NULL DEFAULT 20,        -- délai de livraison minimum (minutes)
@@ -93,6 +98,7 @@ CREATE TABLE commandes (
   statut_paiement    VARCHAR(20) NOT NULL DEFAULT 'en_attente'
                      CHECK (statut_paiement IN ('en_attente', 'paye', 'echoue')),
   reference_paiement VARCHAR(80),                       -- référence renvoyée par l'opérateur
+  commission         INTEGER NOT NULL DEFAULT 0,         -- commission EasyFood (XAF)
   -- Cycle de vie de la commande : restaurateur (jusqu'à "prete") puis livreur ("en_livraison" -> "livree").
   statut             VARCHAR(20) NOT NULL DEFAULT 'en_attente'
                      CHECK (statut IN ('en_attente', 'acceptee', 'en_preparation', 'prete', 'en_livraison', 'livree', 'annulee')),
@@ -138,3 +144,13 @@ CREATE TABLE evaluations (
 
 CREATE INDEX idx_evaluations_restaurant ON evaluations(restaurant_id);
 CREATE INDEX idx_evaluations_livreur ON evaluations(livreur_id);
+
+-- ------------------------------------------------------------
+-- Paramètres globaux (Sprint 4) : configuration éditable par l'admin,
+-- par exemple le taux de commission prélevé sur les transactions.
+-- ------------------------------------------------------------
+CREATE TABLE parametres (
+  cle    VARCHAR(60) PRIMARY KEY,
+  valeur VARCHAR(255) NOT NULL
+);
+INSERT INTO parametres (cle, valeur) VALUES ('taux_commission', '0.10');

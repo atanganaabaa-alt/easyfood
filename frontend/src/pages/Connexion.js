@@ -20,8 +20,12 @@ function Connexion() {
     setChargement(true);
     try {
       const utilisateur = await login(email, motDePasse);
-      // On redirige le restaurateur vers son tableau de bord, sinon vers les restaurants.
-      navigate(utilisateur.role === 'restaurateur' ? '/restaurateur' : '/restaurants');
+      const routes = {
+        restaurateur: '/restaurateur',
+        livreur: '/livreur',
+        admin: '/admin',
+      };
+      navigate(routes[utilisateur.role] || '/restaurants');
     } catch (err) {
       setErreur(err.response?.data?.message || 'Connexion impossible. Réessayez.');
     } finally {

@@ -34,6 +34,11 @@ function Restaurants() {
   const [geoErreur, setGeoErreur] = useState('');
   const [geoChargement, setGeoChargement] = useState(false);
   const [carteVisible, setCarteVisible] = useState(false);
+  // Filtres (Sprint 4) : catégorie, note minimale, distance maximale.
+  const [categories, setCategories] = useState([]);
+  const [categorie, setCategorie] = useState('');
+  const [noteMin, setNoteMin] = useState(0);
+  const [distanceMax, setDistanceMax] = useState(0);
 
   // Récupère la liste des restaurants au chargement de la page.
   useEffect(() => {
@@ -54,6 +59,13 @@ function Restaurants() {
   useEffect(() => {
     setRecherche(searchParams.get('q') || '');
   }, [searchParams]);
+
+  // Charge la liste des catégories disponibles (pour le filtre).
+  useEffect(() => {
+    api.get('/restaurants/meta/categories')
+      .then(({ data }) => setCategories(data))
+      .catch(() => {});
+  }, []);
 
   // Demande la position du navigateur (géolocalisation).
   const utiliserMaPosition = () => {
@@ -101,11 +113,15 @@ function Restaurants() {
     ).id;
   }, [restaurantsEnrichis]);
 
-  // Filtre (recherche) puis trie la liste selon le critère choisi.
+  // Filtre (recherche + catégorie + note + distance) puis trie la liste.
   const affiches = useMemo(() => {
     const filtres = restaurantsEnrichis.filter((r) => {
       const texte = `${r.nom} ${r.adresse}`.toLowerCase();
-      return texte.includes(recherche.toLowerCase());
+      if (!texte.includes(recherche.toLowerCase())) return false;
+      if (categorie && r.categorie !== categorie) return false;
+      if (noteMin && Number(r.note) < noteMin) return false;
+      if (distanceMax && Number(r.distance_km) > distanceMax) return false;
+      return true;
     });
 
     const trie = [...filtres];
@@ -126,7 +142,7 @@ function Restaurants() {
         trie.sort((a, b) => scoreComparaison(a) - scoreComparaison(b));
     }
     return trie;
-  }, [restaurantsEnrichis, recherche, tri]);
+  }, [restaurantsEnrichis, recherche, tri, categorie, noteMin, distanceMax]);
 
   return (
     <div className="ef-container ef-page">
@@ -181,6 +197,37 @@ function Restaurants() {
         ))}
       </div>
 
+      {/* Filtres : catégorie, note minimale, distance maximale. */}
+      <div className="ef-filtres">
+        <select className="ef-select" value={categorie} onChange={(e) => setCategorie(e.target.value)}>
+          <option value="">Toutes les catégories</option>
+          {categories.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+        <select className="ef-select" value={noteMin} onChange={(e) => setNoteMin(Number(e.target.value))}>
+          <option value={0}>Toutes les notes</option>
+          <option value={4.5}>4,5 ★ et plus</option>
+          <option value={4}>4 ★ et plus</option>
+          <option value={3}>3 ★ et plus</option>
+        </select>
+        <select className="ef-select" value={distanceMax} onChange={(e) => setDistanceMax(Number(e.target.value))}>
+          <option value={0}>Toutes distances</option>
+          <option value={2}>Moins de 2 km</option>
+          <option value={5}>Moins de 5 km</option>
+          <option value={10}>Moins de 10 km</option>
+        </select>
+        {(categorie || noteMin > 0 || distanceMax > 0) && (
+          <button
+            type="button"
+            className="ef-chip"
+            onClick={() => { setCategorie(''); setNoteMin(0); setDistanceMax(0); }}
+          >
+            Réinitialiser
+          </button>
+        )}
+      </div>
+
       {chargement && <p className="ef-center ef-text-muted ef-mt">Chargement en cours...</p>}
       {erreur && <div className="ef-alert ef-alert-error ef-mt">{erreur}</div>}
 
@@ -196,6 +243,7 @@ function Restaurants() {
             </div>
             <div className="ef-resto-body">
               <h3>{r.nom}</h3>
+              {r.categorie && <span className="ef-resto-cat">{r.categorie}</span>}
               {r.description && <p className="ef-text-muted ef-resto-desc">{r.description}</p>}
 
               {/* Ligne de métadonnées : note, délai, distance, frais. */}
