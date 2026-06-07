@@ -9,6 +9,7 @@ const platRoutes       = require('./routes/plat.routes');
 const commandeRoutes   = require('./routes/commande.routes');
 const uploadRoutes     = require('./routes/upload.routes');
 const adminRoutes      = require('./routes/admin.routes');
+const equipeRoutes     = require('./routes/equipe.routes');
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/plats',       platRoutes);
 app.use('/api/commandes',   commandeRoutes);
 app.use('/api/upload',      uploadRoutes);
 app.use('/api/admin',       adminRoutes);
+app.use('/api/equipe',      equipeRoutes);
 
 // Route de test
 app.get('/', (req, res) => {

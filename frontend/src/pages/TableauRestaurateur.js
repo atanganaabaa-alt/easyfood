@@ -9,8 +9,9 @@ import './TableauRestaurateur.css';
 
 // Champs vides pour le formulaire de profil du restaurant.
 const RESTO_VIDE = {
-  nom: '', adresse: '', description: '', logo_url: '', horaires: '',
+  nom: '', adresse: '', description: '', logo_url: '', horaires: '', categorie: '',
   delai_min: 20, delai_max: 40, frais_livraison: 0, distance_km: 0,
+  latitude: '', longitude: '',
 };
 // Champs vides pour le formulaire d'ajout de plat.
 const PLAT_VIDE = { nom: '', description: '', prix: '', photo_url: '' };
@@ -25,6 +26,9 @@ function TableauRestaurateur() {
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState('');
   const [succes, setSucces] = useState('');
+  // Équipe de livraison (livraison v2).
+  const [livreurs, setLivreurs] = useState([]);
+  const [emailLivreur, setEmailLivreur] = useState('');
 
   // Charge le restaurant du restaurateur connecté (s'il en a déjà un) et ses plats.
   const charger = useCallback(async () => {
@@ -42,10 +46,13 @@ function TableauRestaurateur() {
           description: monResto.description || '',
           logo_url: monResto.logo_url || '',
           horaires: monResto.horaires || '',
+          categorie: monResto.categorie || '',
           delai_min: monResto.delai_min ?? 20,
           delai_max: monResto.delai_max ?? 40,
           frais_livraison: monResto.frais_livraison ?? 0,
           distance_km: monResto.distance_km ?? 0,
+          latitude: monResto.latitude ?? '',
+          longitude: monResto.longitude ?? '',
         });
         const { data: sesPlats } = await api.get(`/plats/restaurant/${monResto.id}`);
         setPlats(sesPlats);
@@ -56,6 +63,20 @@ function TableauRestaurateur() {
       setChargement(false);
     }
   }, [user.id]);
+
+  // Charge l'équipe de livreurs du restaurateur.
+  const chargerLivreurs = useCallback(async () => {
+    try {
+      const { data } = await api.get('/equipe/livreurs');
+      setLivreurs(data);
+    } catch (err) {
+      /* silencieux : la section équipe affichera juste une liste vide */
+    }
+  }, []);
+
+  useEffect(() => {
+    chargerLivreurs();
+  }, [chargerLivreurs]);
 
   useEffect(() => {
     charger();
@@ -78,6 +99,8 @@ function TableauRestaurateur() {
       delai_max: Number(formResto.delai_max) || 0,
       frais_livraison: Number(formResto.frais_livraison) || 0,
       distance_km: Number(formResto.distance_km) || 0,
+      latitude: formResto.latitude === '' ? null : Number(formResto.latitude),
+      longitude: formResto.longitude === '' ? null : Number(formResto.longitude),
     };
     try {
       if (restaurant) {
@@ -139,6 +162,47 @@ function TableauRestaurateur() {
     }
   };
 
+  // Pré-remplit les coordonnées avec la position actuelle du navigateur.
+  const utiliserMaPosition = () => {
+    if (!navigator.geolocation) {
+      setErreur("La géolocalisation n'est pas disponible sur ce navigateur.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        modifierResto('latitude', pos.coords.latitude.toFixed(6));
+        modifierResto('longitude', pos.coords.longitude.toFixed(6));
+        setSucces('Position renseignée. Pensez à enregistrer.');
+      },
+      () => setErreur("Impossible d'obtenir votre position."),
+    );
+  };
+
+  // Recrute un livreur dans l'équipe (par email).
+  const ajouterLivreur = async (e) => {
+    e.preventDefault();
+    setErreur('');
+    setSucces('');
+    try {
+      const { data } = await api.post('/equipe/livreurs', { email: emailLivreur });
+      setLivreurs((prev) => [...prev, data]);
+      setEmailLivreur('');
+      setSucces(`${data.nom} a rejoint votre équipe de livraison.`);
+    } catch (err) {
+      setErreur(err.response?.data?.message || "Ajout du livreur impossible.");
+    }
+  };
+
+  // Retire un livreur de l'équipe.
+  const retirerLivreur = async (id) => {
+    try {
+      await api.delete(`/equipe/livreurs/${id}`);
+      setLivreurs((prev) => prev.filter((l) => l.id !== id));
+    } catch (err) {
+      setErreur("Retrait impossible.");
+    }
+  };
+
   if (chargement) {
     return <p className="ef-center ef-text-muted ef-page">Chargement de votre espace...</p>;
   }
@@ -193,6 +257,12 @@ function TableauRestaurateur() {
             </div>
           </div>
 
+          <div className="ef-field">
+            <label className="ef-label" htmlFor="r-cat">Catégorie</label>
+            <input id="r-cat" className="ef-input" placeholder="Ex : Grillades, Cuisine camerounaise..."
+              value={formResto.categorie} onChange={(e) => modifierResto('categorie', e.target.value)} />
+          </div>
+
           {/* Infos de livraison utilisées pour la comparaison côté client. */}
           <div className="ef-grid-2">
             <div className="ef-field">
@@ -219,11 +289,75 @@ function TableauRestaurateur() {
             </div>
           </div>
 
-          <button type="submit" className="ef-btn ef-btn-primary">
-            {restaurant ? 'Enregistrer les modifications' : 'Créer mon restaurant'}
+          {/* Coordonnées GPS : permettent d'afficher le restaurant sur la carte. */}
+          <div className="ef-grid-2">
+            <div className="ef-field">
+              <label className="ef-label" htmlFor="r-lat">Latitude</label>
+              <input id="r-lat" type="number" step="0.000001" className="ef-input" placeholder="4.0511"
+                value={formResto.latitude} onChange={(e) => modifierResto('latitude', e.target.value)} />
+            </div>
+            <div className="ef-field">
+              <label className="ef-label" htmlFor="r-lng">Longitude</label>
+              <input id="r-lng" type="number" step="0.000001" className="ef-input" placeholder="9.7679"
+                value={formResto.longitude} onChange={(e) => modifierResto('longitude', e.target.value)} />
+            </div>
+          </div>
+          <button type="button" className="ef-btn ef-btn-outline ef-btn-sm ef-mb" onClick={utiliserMaPosition}>
+            Utiliser ma position actuelle
           </button>
+
+          <div>
+            <button type="submit" className="ef-btn ef-btn-primary">
+              {restaurant ? 'Enregistrer les modifications' : 'Créer mon restaurant'}
+            </button>
+          </div>
         </form>
       </section>
+
+      {/* ---- Équipe de livraison ---- */}
+      {restaurant && (
+        <section className="ef-card ef-dash-card">
+          <h2>Mon équipe de livraison</h2>
+          <p className="ef-text-muted">
+            Recrutez vos livreurs par email. Ils ne verront que les commandes de votre restaurant.
+            Le livreur doit d'abord créer un compte avec le rôle « livreur ».
+          </p>
+          <form onSubmit={ajouterLivreur} className="ef-equipe-form ef-mt">
+            <input
+              type="email"
+              className="ef-input"
+              placeholder="email.du.livreur@exemple.cm"
+              value={emailLivreur}
+              onChange={(e) => setEmailLivreur(e.target.value)}
+              required
+            />
+            <button type="submit" className="ef-btn ef-btn-primary">Ajouter</button>
+          </form>
+
+          {livreurs.length === 0 ? (
+            <p className="ef-text-muted ef-mt">Aucun livreur dans votre équipe pour le moment.</p>
+          ) : (
+            <ul className="ef-plat-liste ef-mt">
+              {livreurs.map((l) => (
+                <li key={l.id} className="ef-plat-ligne">
+                  <div className="ef-plat-ligne-info">
+                    <strong>{l.nom}</strong>
+                    <span className="ef-text-muted">{l.email}</span>
+                    <span className="ef-text-muted">
+                      {Number(l.note) > 0 ? `${l.note} ★` : 'Nouveau'} · {l.nb_courses} courses
+                    </span>
+                  </div>
+                  <div className="ef-plat-ligne-actions">
+                    <button className="ef-btn ef-btn-ghost ef-btn-sm ef-btn-danger" onClick={() => retirerLivreur(l.id)}>
+                      Retirer
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
       {/* ---- Gestion du menu (uniquement si le restaurant existe) ---- */}
       {restaurant && (

@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import Etoiles from '../components/Etoiles';
+import CarteSuivi from '../components/CarteSuivi';
 import { formaterPrix, infoStatut, formaterDate, ETAPES_SUIVI, indiceEtape } from '../utils/format';
 import './Commandes.css';
 
@@ -165,6 +166,14 @@ function MesCommandes() {
                   Livreur : {c.livreur_nom}
                   {c.livreur_telephone ? ` · ${c.livreur_telephone}` : ''}
                 </p>
+              )}
+
+              {/* Carte de suivi en direct : restaurant + position du livreur. */}
+              {c.statut === 'en_livraison' && (c.livreur_lat != null || c.restaurant_lat != null) && (
+                <CarteSuivi
+                  restaurant={{ lat: c.restaurant_lat, lng: c.restaurant_lng, nom: c.restaurant_nom }}
+                  livreur={{ lat: c.livreur_lat, lng: c.livreur_lng }}
+                />
               )}
 
               <ul className="ef-cmd-items">

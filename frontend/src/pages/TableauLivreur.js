@@ -59,6 +59,29 @@ function TableauLivreur() {
   const enCours = mesLivraisons.filter((c) => c.statut === 'en_livraison');
   const historique = mesLivraisons.filter((c) => c.statut === 'livree');
 
+  // Partage automatique de la position GPS tant qu'une livraison est en cours.
+  const enCoursIds = enCours.map((c) => c.id).join(',');
+  const [partagePosition, setPartagePosition] = useState(false);
+  useEffect(() => {
+    if (!enCoursIds || !navigator.geolocation) {
+      setPartagePosition(false);
+      return undefined;
+    }
+    const ids = enCoursIds.split(',');
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        setPartagePosition(true);
+        const { latitude, longitude } = pos.coords;
+        ids.forEach((id) => {
+          api.put(`/commandes/${id}/position`, { lat: latitude, lng: longitude }).catch(() => {});
+        });
+      },
+      () => setPartagePosition(false),
+      { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 },
+    );
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, [enCoursIds]);
+
   return (
     <div className="ef-container ef-page">
       <div className="ef-page-head">
@@ -76,6 +99,11 @@ function TableauLivreur() {
       {enCours.length > 0 && (
         <section className="ef-mb">
           <h2 className="ef-section-title">Livraison en cours</h2>
+          <p className="ef-text-muted">
+            {partagePosition
+              ? 'Partage de votre position activé — le client suit votre trajet en direct.'
+              : 'Activez la localisation de votre navigateur pour partager votre position au client.'}
+          </p>
           <div className="ef-cmd-liste">
             {enCours.map((c) => (
               <div key={c.id} className="ef-card ef-cmd-card ef-cmd-nouvelle">

@@ -33,8 +33,12 @@ CREATE TABLE users (
   -- Back-office (Sprint 4) : suspension de compte + validation des restaurateurs.
   actif         BOOLEAN NOT NULL DEFAULT TRUE,
   valide        BOOLEAN NOT NULL DEFAULT TRUE,
+  -- Livraison v2 : un livreur est rattaché à un restaurateur (son employeur).
+  employeur_id  INTEGER REFERENCES users(id) ON DELETE SET NULL,
   created_at    TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX idx_users_employeur ON users(employeur_id);
 
 -- ------------------------------------------------------------
 -- Table des restaurants (appartiennent à un restaurateur)
@@ -104,6 +108,9 @@ CREATE TABLE commandes (
                      CHECK (statut IN ('en_attente', 'acceptee', 'en_preparation', 'prete', 'en_livraison', 'livree', 'annulee')),
   -- Livreur affecté à la commande (Sprint 3). NULL tant qu'aucun livreur n'a pris la mission.
   livreur_id         INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  -- Position GPS du livreur (livraison v2) pour le suivi en temps réel.
+  livreur_lat        NUMERIC(9,6),
+  livreur_lng        NUMERIC(9,6),
   created_at         TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

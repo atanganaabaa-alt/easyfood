@@ -117,9 +117,12 @@ exports.create = async (req, res) => {
     await client.query('COMMIT');
 
     // 3) Notifications (client + restaurateur). N'empêchent jamais la commande.
+    const messagePaiement = commande.statut_paiement === 'paye'
+      ? `confirmée et payée (${total} XAF)`
+      : `enregistrée (${total} XAF) — validez le paiement sur votre téléphone`;
     await envoyerNotification({
       telephone,
-      message: `EasyFood : votre commande #${commande.id} chez ${restaurant.nom} est confirmée et payée (${total} XAF). Merci !`,
+      message: `EasyFood : votre commande #${commande.id} chez ${restaurant.nom} est ${messagePaiement}. Merci !`,
     });
     const resProprio = await pool.query('SELECT telephone FROM users WHERE id = $1', [restaurant.proprietaire_id]);
     if (resProprio.rows[0]?.telephone) {
@@ -147,6 +150,7 @@ exports.mesCommandes = async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT c.*, r.nom AS restaurant_nom, r.logo_url AS restaurant_logo,
+              r.latitude AS restaurant_lat, r.longitude AS restaurant_lng,
               l.nom AS livreur_nom, l.telephone AS livreur_telephone,
               e.id AS evaluation_id, e.note_restaurant, e.note_livreur
        FROM commandes c
@@ -275,6 +279,14 @@ exports.missionsDisponibles = async (req, res) => {
     return res.status(403).json({ message: 'Accès réservé aux livreurs.' });
   }
   try {
+    // Le livreur ne voit que les commandes prêtes des restaurants de son employeur.
+    const resEmp = await pool.query('SELECT employeur_id FROM users WHERE id = $1', [req.user.id]);
+    const employeurId = resEmp.rows[0]?.employeur_id;
+    if (!employeurId) {
+      // Livreur non rattaché à un restaurateur : aucune mission.
+      return res.json([]);
+    }
+
     const result = await pool.query(
       `SELECT c.id, c.adresse_livraison, c.telephone, c.total, c.frais_livraison,
               c.created_at, r.nom AS restaurant_nom, r.adresse AS restaurant_adresse,
@@ -282,7 +294,9 @@ exports.missionsDisponibles = async (req, res) => {
        FROM commandes c
        JOIN restaurants r ON r.id = c.restaurant_id
        WHERE c.statut = 'prete' AND c.livreur_id IS NULL
-       ORDER BY c.created_at ASC`
+         AND r.proprietaire_id = $1
+       ORDER BY c.created_at ASC`,
+      [employeurId]
     );
     res.json(result.rows);
   } catch (err) {
@@ -386,6 +400,34 @@ exports.confirmerLivraison = async (req, res) => {
 
     const complete = await commandeComplete(commande.id);
     res.json(complete);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+};
+
+// ------------------------------------------------------------
+// METTRE À JOUR LA POSITION DU LIVREUR (suivi temps réel)
+// ------------------------------------------------------------
+exports.majPosition = async (req, res) => {
+  if (req.user.role !== 'livreur') {
+    return res.status(403).json({ message: 'Accès réservé aux livreurs.' });
+  }
+  const lat = Number(req.body.lat);
+  const lng = Number(req.body.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    return res.status(400).json({ message: 'Coordonnées invalides.' });
+  }
+  try {
+    const result = await pool.query(
+      `UPDATE commandes SET livreur_lat = $1, livreur_lng = $2
+       WHERE id = $3 AND livreur_id = $4 AND statut = 'en_livraison'
+       RETURNING id`,
+      [lat, lng, req.params.id, req.user.id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(409).json({ message: 'Position non enregistrée (commande non en livraison).' });
+    }
+    res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur.' });
   }

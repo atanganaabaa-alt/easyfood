@@ -14,6 +14,13 @@
   margin-bottom: 20px;
 }
 
+.ef-equipe-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ef-equipe-form .ef-input { flex: 1; min-width: 200px; }
+
 /* Grille à deux colonnes pour les champs courts (responsive). */
 .ef-grid-2 {
   display: grid;

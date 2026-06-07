@@ -37,9 +37,10 @@ Charger le schéma puis les données de démo (facultatif en prod) :
 ```bash
 cd /var/www/easyfood/backend/src/config
 psql -U easyfood_user -d easyfood -f schema.sql
-# Migrations (si la base existait déjà) :
+# Migrations (si la base existait déjà), dans l'ordre :
 psql -U easyfood_user -d easyfood -f migration_sprint3.sql
 psql -U easyfood_user -d easyfood -f migration_sprint4.sql
+psql -U easyfood_user -d easyfood -f migration_livraison_v2.sql
 # Données de démo (optionnel) :
 node seed.js
 ```
@@ -146,10 +147,19 @@ sudo systemctl reload nginx
 
 ## Notes
 
-- **Paiement Mobile Money / Notifications** : les services
-  `paiement.service.js` et `notification.service.js` sont actuellement
-  **simulés**. Pour la production, y brancher les vraies API
-  (Orange Money, MTN MoMo, Twilio/SMS) en gardant la même interface.
+- **Paiement Mobile Money** : le service `paiement.service.js` gère deux modes
+  via `PAIEMENT_MODE` dans le `.env` :
+  - `simulation` (défaut) : paiement auto-validé, pour le développement.
+  - `reel` : appelle réellement MTN MoMo Collections et Orange Money WebPay.
+    Renseignez alors les clés `MTN_*` et `ORANGE_*` (voir `.env.example`).
+  Le client valide toujours le paiement avec son code PIN **sur son propre
+  téléphone** (notification de l'opérateur) ; l'application ne manipule jamais
+  ce secret. Les notifications (`notification.service.js`) restent simulées :
+  brancher Twilio / SMS API Orange en gardant la même interface.
+- **Équipe de livraison** : chaque restaurateur recrute ses propres livreurs
+  (par email) ; un livreur ne voit que les commandes prêtes de son employeur.
+- **Suivi en temps réel** : le livreur partage sa position GPS pendant la
+  livraison, et le client la visualise sur une carte (restaurant + livreur).
 - **Sécurité** : changer le `JWT_SECRET`, restreindre l'accès PostgreSQL au
   localhost, et envisager un rate-limiter (ex. `express-rate-limit`).
 - **Application mobile React Native** : non incluse dans ce dépôt web.

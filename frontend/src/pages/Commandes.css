@@ -152,6 +152,15 @@
 .ef-eval-ligne { margin-bottom: 10px; }
 .ef-eval-ligne .ef-label { display: block; margin-bottom: 2px; }
 .ef-eval-merci { color: var(--ef-vert-fonce); font-weight: 600; }
+.ef-carte-suivi {
+  height: 240px;
+  border-radius: var(--ef-radius);
+  overflow: hidden;
+  border: 1px solid var(--ef-bordure);
+  margin: 12px 0;
+}
+.ef-carte-suivi .leaflet-container { font: inherit; }
+
 .ef-livreur-info {
   font-size: 0.85rem;
   color: var(--ef-gris);

@@ -115,6 +115,12 @@ async function seed() {
       throw new Error('Restaurateur de démo introuvable.');
     }
 
+    // Rattache le livreur de démo à l'équipe du restaurateur de démo.
+    await pool.query(
+      `UPDATE users SET employeur_id = $1 WHERE email = 'livreur@easyfood.cm'`,
+      [restaurateurId]
+    );
+
     for (const r of RESTAURANTS) {
       const resResto = await pool.query(
         `INSERT INTO restaurants

@@ -11,6 +11,7 @@ router.get('/mes-missions',   protect, c.mesMissions);            // mes livrais
 router.get('/:id',            protect, c.getOne);                 // détail d'une commande
 router.put('/:id/statut',     protect, c.changerStatut);          // changer le statut (restaurateur)
 router.put('/:id/accepter',   protect, c.accepterMission);        // accepter une mission (livreur)
+router.put('/:id/position',   protect, c.majPosition);            // position GPS du livreur (livreur)
 router.put('/:id/livrer',     protect, c.confirmerLivraison);     // confirmer la livraison (livreur)
 router.post('/:id/evaluation', protect, c.evaluer);               // noter resto + livreur (client)
 
